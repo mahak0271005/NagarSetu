@@ -2,12 +2,10 @@ package com.ecosphere.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class AuthResponse {
-
-    private String token;
+public class UpvoteResponse {
+    private Long complaintId;
+    private Integer upvoteCount;
 }

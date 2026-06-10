@@ -2,8 +2,9 @@ package com.ecosphere.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -11,6 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Complaint {
+    @JsonIgnore
+    @OneToMany(mappedBy = "complaint")
+    private List<Upvote> upvotes;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,10 +44,12 @@ public class Complaint {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
     public void setCreatedAt(LocalDateTime now) {
+        this.createdAt = now;
     }
 
     public void setStatus(ComplaintStatus status) {
+        this.status = status;
     }
+
 }

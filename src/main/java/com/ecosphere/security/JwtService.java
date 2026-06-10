@@ -26,20 +26,14 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
 
         return Jwts.builder()
-
                 .setSubject(userDetails.getUsername())
-
                 .setIssuedAt(new Date())
-
                 .setExpiration(
-                        new Date(System.currentTimeMillis() + 1000 * 60 * 60)
+                        new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)
                 )
-
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-
                 .compact();
     }
-
     public String extractUsername(String token) {
 
         return extractAllClaims(token).getSubject();

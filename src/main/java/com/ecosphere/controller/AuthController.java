@@ -2,6 +2,7 @@ package com.ecosphere.controller;
 
 import com.ecosphere.dto.*;
 import com.ecosphere.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,14 +15,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public AuthResponse register(
-            @RequestBody RegisterRequest request
+            @Valid @RequestBody RegisterRequest request
     ) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
     public AuthResponse login(
-            @RequestBody LoginRequest request
+            @Valid @RequestBody LoginRequest request
     ) {
         return authService.login(request);
     }

@@ -4,8 +4,8 @@ import com.ecosphere.dto.*;
 import com.ecosphere.entity.Role;
 import com.ecosphere.entity.User;
 import com.ecosphere.repository.UserRepository;
+import com.ecosphere.security.JwtService;
 import com.ecosphere.service.AuthService;
-import com.ecosphere.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,14 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
+
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
 
         User user = new User();
 
@@ -37,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         String token =
-                jwtUtil.generateToken(user.getEmail());
+                jwtService.generateToken(user);
 
         return new AuthResponse(token);
     }
@@ -62,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token =
-                jwtUtil.generateToken(user.getEmail());
+                jwtService.generateToken(user);
 
         return new AuthResponse(token);
     }

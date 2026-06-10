@@ -8,6 +8,15 @@ public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
+        //AI description writing
+        //Auto Location Detection
+        //Similar request suggestion
+        //Approved percentage status
+        //only live photo uploaded , description can be edited later
+        //Thumb application
+        //Live video upload
+        //gps enabled live camera
+        //
 
 	}
 

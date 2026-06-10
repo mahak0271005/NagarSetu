@@ -5,7 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,8 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "user")
+@Table(name = "users")
 public class User implements UserDetails {
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private List<Upvote> upvotes;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +29,7 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     private String email;
-
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -36,7 +39,7 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         return List.of(
-                new SimpleGrantedAuthority(role.name())
+                new SimpleGrantedAuthority("ROLE_"+ role.name())
         );
     }
 
