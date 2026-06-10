@@ -10,9 +10,9 @@ import com.ecosphere.service.CloudinaryService;
 import com.ecosphere.service.ComplaintService;
 import com.ecosphere.dto.CreateComplaintRequest;
 import org.springframework.web.multipart.MultipartFile;
-import com.ecosphere.entity.Upvote;
+
 import com.ecosphere.dto.ComplaintResponse;
-import com.ecosphere.entity.User;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,24 @@ public class ComplaintServiceImpl implements ComplaintService {
         this.cloudinaryService = cloudinaryService;
     }
 
+private int calculatePriority(
+        SeverityLevel severity,
+        int upvotes
+) {
 
+    if(severity == null) {
+        return upvotes;
+    }
+
+    int severityScore = switch (severity) {
+        case LOW -> 1;
+        case MODERATE -> 3;
+        case HIGH -> 5;
+        case CRITICAL -> 8;
+    };
+
+    return severityScore + upvotes;
+}
 
 
     @Override
@@ -64,7 +81,13 @@ public class ComplaintServiceImpl implements ComplaintService {
 
         complaint.setTitle(request.getTitle());
         complaint.setDescription(request.getDescription());
-        complaint.setCategory(request.getCategory());
+        complaint.setSeverity(request.getSeverity());
+        complaint.setCategory(
+        autoTag(
+                request.getTitle(),
+                request.getDescription()
+        )
+);
 
         complaint.setLatitude(request.getLatitude());
         complaint.setLongitude(request.getLongitude());
@@ -81,7 +104,12 @@ public class ComplaintServiceImpl implements ComplaintService {
 
             complaint.setImageUrl(imageUrl);
         }
-
+        complaint.setPriorityScore(
+        calculatePriority(
+                complaint.getSeverity(),
+                complaint.getUpvoteCount()
+        )
+);
         Complaint savedComplaint =
                 complaintRepository.save(complaint);
 
@@ -161,6 +189,12 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaint.setUpvoteCount(
                 complaint.getUpvoteCount() + 1
         );
+        complaint.setPriorityScore(
+        calculatePriority(
+                complaint.getSeverity(),
+                complaint.getUpvoteCount()
+        )
+);
 
         complaintRepository.save(complaint);
 
@@ -209,6 +243,12 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaint.setUpvoteCount(
                 complaint.getUpvoteCount() - 1
         );
+        complaint.setPriorityScore(
+        calculatePriority(
+                complaint.getSeverity(),
+                complaint.getUpvoteCount()
+        )
+);
 
         complaintRepository.save(complaint);
 
@@ -217,6 +257,96 @@ public class ComplaintServiceImpl implements ComplaintService {
                 complaint.getUpvoteCount()
         );
     }
+    private String autoTag(String title, String description) {
+
+    String text = (title + " " + description).toLowerCase();
+
+    // ROAD
+    if(text.contains("road")
+            || text.contains("pothole")
+            || text.contains("gaddha")
+            || text.contains("street")
+            || text.contains("broken road")
+            || text.contains("damaged road")
+            || text.contains("crack")) {
+        return "ROAD";
+    }
+
+    // WATER
+    if(text.contains("water")
+            || text.contains("pani")
+            || text.contains("pipeline")
+            || text.contains("leakage")
+            || text.contains("water supply")
+            || text.contains("drain")
+            || text.contains("sewer")
+            || text.contains("nala")
+            || text.contains("drainage")) {
+        return "WATER";
+    }
+
+    // ELECTRICITY
+    if(text.contains("electricity")
+            || text.contains("power")
+            || text.contains("light")
+            || text.contains("street light")
+            || text.contains("transformer")
+            || text.contains("wire")
+            || text.contains("electric pole")
+            || text.contains("power cut")
+            || text.contains("blackout")) {
+        return "ELECTRICITY";
+    }
+
+    // SANITATION
+    if(text.contains("garbage")
+            || text.contains("kachra")
+            || text.contains("waste")
+            || text.contains("dustbin")
+            || text.contains("cleanliness")
+            || text.contains("dirty")
+            || text.contains("overflowing garbage")) {
+        return "SANITATION";
+    }
+
+    // TRAFFIC
+    if(text.contains("traffic")
+            || text.contains("signal")
+            || text.contains("jam")
+            || text.contains("crossing")
+            || text.contains("accident")
+            || text.contains("parking")) {
+        return "TRAFFIC";
+    }
+
+    // PUBLIC SAFETY
+    if(text.contains("crime")
+            || text.contains("theft")
+            || text.contains("robbery")
+            || text.contains("unsafe")
+            || text.contains("security")
+            || text.contains("harassment")) {
+        return "PUBLIC_SAFETY";
+    }
+
+    // ANIMAL
+    if(text.contains("dog")
+            || text.contains("stray dog")
+            || text.contains("cow")
+            || text.contains("animal")) {
+        return "ANIMAL_CONTROL";
+    }
+
+    // PARKS
+    if(text.contains("park")
+            || text.contains("garden")
+            || text.contains("playground")
+            || text.contains("tree")) {
+        return "PARKS_AND_GREENERY";
+    }
+
+    return "OTHER";
+}
     private ComplaintResponse convertToResponse(
             Complaint complaint
     ) {
@@ -240,6 +370,7 @@ public class ComplaintServiceImpl implements ComplaintService {
                 .longitude(complaint.getLongitude())
                 .imageUrl(complaint.getImageUrl())
                 .upvoteCount(complaint.getUpvoteCount())
+.priorityScore(complaint.getPriorityScore())
                 .createdAt(complaint.getCreatedAt())
 
                 .user(
