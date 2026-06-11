@@ -36,8 +36,10 @@ public class CloudinaryServiceImpl
 
         } catch (Exception e) {
 
+            e.printStackTrace();
+
             throw new RuntimeException(
-                    "Image upload failed"
+                    "Image upload failed: " + e.getMessage()
             );
         }
     }

@@ -26,6 +26,7 @@ public class User implements UserDetails {
     private Long id;
 
     private String name;
+    private boolean isVerified = false;
 
     @Column(unique = true)
     private String email;

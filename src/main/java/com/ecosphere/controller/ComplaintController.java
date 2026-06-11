@@ -39,12 +39,25 @@ public class ComplaintController {
 
     @PostMapping("/upload")
     public ComplaintResponse createComplaint(
-            @RequestPart("data")
-            CreateComplaintRequest request,
 
-            @RequestPart(value = "image", required = false)
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam String category,
+            @RequestParam Double latitude,
+            @RequestParam Double longitude,
+
+            @RequestParam(value = "image", required = false)
             MultipartFile image
     ) {
+
+        CreateComplaintRequest request =
+                new CreateComplaintRequest();
+
+        request.setTitle(title);
+        request.setDescription(description);
+        request.setCategory(category);
+        request.setLatitude(latitude);
+        request.setLongitude(longitude);
 
         return complaintService.createComplaint(
                 request,
