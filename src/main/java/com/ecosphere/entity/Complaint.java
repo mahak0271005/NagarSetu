@@ -39,6 +39,7 @@ public class Complaint {
     private String imageUrl;
 
     private Integer upvoteCount = 0;
+    private Integer priorityScore = 0;
 
     private LocalDateTime createdAt;
     @ManyToOne

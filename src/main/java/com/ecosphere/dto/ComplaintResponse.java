@@ -28,6 +28,7 @@ public class ComplaintResponse {
     private String imageUrl;
 
     private Integer upvoteCount;
+    private Integer priorityScore;
 
     private LocalDateTime createdAt;
 
