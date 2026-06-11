@@ -16,8 +16,6 @@ public class Application {
         //Thumb application
         //Live video upload
         //gps enabled live camera
-        //
 
 	}
-
 }
